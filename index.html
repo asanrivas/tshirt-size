@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <base target="_top">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    :root {
+      color-scheme: light dark;
+      --accent: #1a73e8;
+      --border: #d7dce1;
+      --bg: #f5f6f8;
+      --card: #ffffff;
+      --text: #1b1f23;
+      --muted: #667085;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      padding: 20px 16px 40px;
+    }
+    .card {
+      max-width: 480px;
+      margin: 0 auto;
+      background: var(--card);
+      border-radius: 16px;
+      padding: 24px 20px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+    }
+    h1 {
+      font-size: 1.3rem;
+      margin: 0 0 4px;
+    }
+    p.subtitle {
+      margin: 0 0 24px;
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+    label {
+      display: block;
+      font-weight: 600;
+      font-size: 0.9rem;
+      margin: 20px 0 8px;
+    }
+    select, input[type="text"] {
+      width: 100%;
+      font-size: 1rem;
+      padding: 12px 14px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: var(--card);
+      color: var(--text);
+      appearance: none;
+      -webkit-appearance: none;
+    }
+    .size-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+    }
+    .size-option {
+      position: relative;
+    }
+    .size-option input {
+      position: absolute;
+      opacity: 0;
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      cursor: pointer;
+    }
+    .size-option span {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 14px 0;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      font-weight: 600;
+      font-size: 0.95rem;
+    }
+    .size-option input:checked + span {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #fff;
+    }
+    button {
+      width: 100%;
+      margin-top: 28px;
+      padding: 15px;
+      font-size: 1rem;
+      font-weight: 600;
+      border: none;
+      border-radius: 12px;
+      background: var(--accent);
+      color: #fff;
+      cursor: pointer;
+    }
+    button:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+    .status {
+      margin-top: 16px;
+      padding: 12px 14px;
+      border-radius: 10px;
+      font-size: 0.9rem;
+      display: none;
+    }
+    .status.success {
+      display: block;
+      background: #e6f4ea;
+      color: #1e7e34;
+    }
+    .status.error {
+      display: block;
+      background: #fdecea;
+      color: #c5221f;
+    }
+    .helper {
+      font-size: 0.8rem;
+      color: var(--muted);
+      margin-top: 6px;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>Family Day Size Baju</h1>
+    <p class="subtitle">Pilih nama anda dan saiz baju yang dikehendaki.</p>
+
+    <form id="sizeForm">
+      <label for="nameSelect">Nama</label>
+      <select id="nameSelect" required>
+        <option value="" disabled selected>Memuatkan senarai nama...</option>
+      </select>
+
+      <label>Size Baju</label>
+      <div class="size-grid" id="sizeGrid">
+        <!-- size options injected by JS -->
+      </div>
+      <input type="text" id="customSize" placeholder="Saiz lain (cth: umur 8 tahun)" style="margin-top:10px;">
+      <div class="helper">Pilih saiz di atas, atau taip saiz lain jika tidak disenaraikan.</div>
+
+      <label for="catatan">Catatan (pilihan)</label>
+      <input type="text" id="catatan" placeholder="cth: Muslimah, T-Shirt (L.Pendek)">
+
+      <button type="submit" id="submitBtn">Hantar</button>
+      <div class="status" id="status"></div>
+    </form>
+  </div>
+
+  <script>
+    const SIZES = ['XS', 'S', 'M', 'L', 'XL', '2XL', '3XL', '4XL'];
+    const sizeGrid = document.getElementById('sizeGrid');
+    SIZES.forEach(function (size) {
+      const label = document.createElement('label');
+      label.className = 'size-option';
+      label.innerHTML =
+        '<input type="radio" name="size" value="' + size + '">' +
+        '<span>' + size + '</span>';
+      sizeGrid.appendChild(label);
+    });
+
+    const nameSelect = document.getElementById('nameSelect');
+    const customSize = document.getElementById('customSize');
+    const statusEl = document.getElementById('status');
+    const submitBtn = document.getElementById('submitBtn');
+
+    function populateNames(names) {
+      nameSelect.innerHTML = '';
+      const placeholder = document.createElement('option');
+      placeholder.value = '';
+      placeholder.disabled = true;
+      placeholder.selected = true;
+      placeholder.textContent = names.length ? 'Pilih nama anda' : 'Tiada nama dijumpai';
+      nameSelect.appendChild(placeholder);
+
+      names.forEach(function (name) {
+        const opt = document.createElement('option');
+        opt.value = name;
+        opt.textContent = name;
+        nameSelect.appendChild(opt);
+      });
+    }
+
+    function showStatus(message, type) {
+      statusEl.textContent = message;
+      statusEl.className = 'status ' + type;
+    }
+
+    google.script.run
+      .withSuccessHandler(populateNames)
+      .withFailureHandler(function (err) {
+        showStatus('Gagal memuatkan senarai nama: ' + err.message, 'error');
+      })
+      .getNames();
+
+    document.getElementById('sizeForm').addEventListener('submit', function (e) {
+      e.preventDefault();
+      const name = nameSelect.value;
+      const checkedSize = document.querySelector('input[name="size"]:checked');
+      const size = customSize.value.trim() || (checkedSize ? checkedSize.value : '');
+      const catatan = document.getElementById('catatan').value.trim();
+
+      if (!name) {
+        showStatus('Sila pilih nama anda.', 'error');
+        return;
+      }
+      if (!size) {
+        showStatus('Sila pilih atau taip saiz baju.', 'error');
+        return;
+      }
+
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Menghantar...';
+      statusEl.className = 'status';
+
+      google.script.run
+        .withSuccessHandler(function (result) {
+          submitBtn.disabled = false;
+          submitBtn.textContent = 'Hantar';
+          showStatus('Berjaya! ' + result.name + ' - saiz ' + result.size + ' telah disimpan.', 'success');
+        })
+        .withFailureHandler(function (err) {
+          submitBtn.disabled = false;
+          submitBtn.textContent = 'Hantar';
+          showStatus(err.message, 'error');
+        })
+        .submitSize(name, size, catatan);
+    });
+  </script>
+</body>
+</html>
