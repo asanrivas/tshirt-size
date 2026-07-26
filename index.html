@@ -147,7 +147,14 @@
       <div class="helper">Pilih saiz di atas, atau taip saiz lain jika tidak disenaraikan.</div>
 
       <label for="catatan">Catatan (pilihan)</label>
-      <input type="text" id="catatan" placeholder="cth: Muslimah, T-Shirt (L.Pendek)">
+      <select id="catatan">
+        <option value="">-- Tiada --</option>
+        <option value="Muslimah">Muslimah</option>
+        <option value="T-Shirt (L.Pendek)">T-Shirt (L.Pendek)</option>
+        <option value="T-Shirt (L.Panjang)">T-Shirt (L.Panjang)</option>
+        <option value="__other__">Lain-lain...</option>
+      </select>
+      <input type="text" id="catatanOther" placeholder="Nyatakan catatan lain" style="margin-top:10px; display:none;">
 
       <button type="submit" id="submitBtn">Hantar</button>
       <div class="status" id="status"></div>
@@ -168,8 +175,14 @@
 
     const nameSelect = document.getElementById('nameSelect');
     const customSize = document.getElementById('customSize');
+    const catatanSelect = document.getElementById('catatan');
+    const catatanOther = document.getElementById('catatanOther');
     const statusEl = document.getElementById('status');
     const submitBtn = document.getElementById('submitBtn');
+
+    catatanSelect.addEventListener('change', function () {
+      catatanOther.style.display = catatanSelect.value === '__other__' ? 'block' : 'none';
+    });
 
     function populateNames(names) {
       nameSelect.innerHTML = '';
@@ -208,7 +221,7 @@
       const name = nameSelect.value;
       const checkedSize = document.querySelector('input[name="size"]:checked');
       const size = customSize.value.trim() || (checkedSize ? checkedSize.value : '');
-      const catatan = document.getElementById('catatan').value.trim();
+      const catatan = catatanSelect.value === '__other__' ? catatanOther.value.trim() : catatanSelect.value;
 
       if (!name) {
         showStatus('Sila pilih nama anda.', 'error');
