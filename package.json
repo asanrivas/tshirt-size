@@ -1,0 +1,12 @@
+{
+  "name": "tshirt-size-form",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Mobile-friendly t-shirt size collection form that updates a Google Sheet",
+  "engines": {
+    "node": "20.x"
+  },
+  "dependencies": {
+    "googleapis": "^144.0.0"
+  }
+}
