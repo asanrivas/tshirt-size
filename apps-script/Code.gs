@@ -54,7 +54,9 @@ function findHeader_(sheet) {
 /**
  * Returns the list of names in the Nama column, for populating the
  * form's dropdown so people pick their existing row instead of typing
- * a name that might not match.
+ * a name that might not match. Each entry also flags whether that row's
+ * Size Baju is already filled, so the form can show a "sudah diisi"
+ * indicator.
  */
 function getNames() {
   const sheet = getSheet_();
@@ -62,13 +64,17 @@ function getNames() {
   const lastRow = sheet.getLastRow();
   if (lastRow <= header.headerRow) return [];
 
-  const values = sheet
-    .getRange(header.headerRow + 1, header.namaCol, lastRow - header.headerRow, 1)
-    .getValues();
+  const numRows = lastRow - header.headerRow;
+  const namaValues = sheet.getRange(header.headerRow + 1, header.namaCol, numRows, 1).getValues();
+  const sizeValues = sheet.getRange(header.headerRow + 1, header.sizeCol, numRows, 1).getValues();
 
-  return values
-    .map(function (row) { return String(row[0]).trim(); })
-    .filter(function (name) { return name.length > 0; });
+  const result = [];
+  for (let i = 0; i < namaValues.length; i++) {
+    const name = String(namaValues[i][0]).trim();
+    if (!name) continue;
+    result.push({ name: name, filled: String(sizeValues[i][0]).trim().length > 0 });
+  }
+  return result;
 }
 
 /**

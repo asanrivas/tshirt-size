@@ -203,10 +203,10 @@
       placeholder.textContent = names.length ? 'Pilih nama anda' : 'Tiada nama dijumpai';
       nameSelect.appendChild(placeholder);
 
-      names.forEach(function (name) {
+      names.forEach(function (entry) {
         const opt = document.createElement('option');
-        opt.value = name;
-        opt.textContent = name;
+        opt.value = entry.name;
+        opt.textContent = entry.filled ? entry.name + ' ✅ (sudah diisi)' : entry.name;
         nameSelect.appendChild(opt);
       });
     }
