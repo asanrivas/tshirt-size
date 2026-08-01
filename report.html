@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#1a73e8">
+  <title>Ringkasan Family Day Size Baju</title>
+  <style>
+    :root {
+      color-scheme: light dark;
+      --accent: #1a73e8;
+      --border: #d7dce1;
+      --bg: #f5f6f8;
+      --card: #ffffff;
+      --text: #1b1f23;
+      --muted: #667085;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      padding: 20px 16px 40px;
+    }
+    .card {
+      max-width: 640px;
+      margin: 0 auto;
+      background: var(--card);
+      border-radius: 16px;
+      padding: 24px 20px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+    }
+    h1 {
+      font-size: 1.3rem;
+      margin: 0 0 4px;
+    }
+    p.subtitle {
+      margin: 0 0 20px;
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.9rem;
+    }
+    th, td {
+      text-align: left;
+      padding: 10px 8px;
+      border-bottom: 1px solid var(--border);
+    }
+    th {
+      color: var(--muted);
+      font-weight: 600;
+      font-size: 0.8rem;
+      text-transform: uppercase;
+    }
+    td.num, th.num {
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+    }
+    tfoot td {
+      font-weight: 700;
+      border-bottom: none;
+      border-top: 2px solid var(--text);
+    }
+    button {
+      margin-top: 20px;
+      padding: 12px 16px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      border: none;
+      border-radius: 10px;
+      background: var(--accent);
+      color: #fff;
+      cursor: pointer;
+    }
+    .status {
+      margin-top: 20px;
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+    .status.error {
+      color: #c5221f;
+    }
+    a.back {
+      display: inline-block;
+      margin-top: 20px;
+      color: var(--accent);
+      font-size: 0.9rem;
+      text-decoration: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>Ringkasan Perfamily</h1>
+    <p class="subtitle">Jumlah T-Shirt + Makanan mengikut keluarga.</p>
+
+    <table id="reportTable">
+      <thead>
+        <tr>
+          <th>Family</th>
+          <th>Ketua</th>
+          <th class="num">T-Shirt (RM)</th>
+          <th class="num">Makanan (RM)</th>
+          <th class="num">Total (RM)</th>
+        </tr>
+      </thead>
+      <tbody id="reportBody">
+        <tr><td colspan="5">Memuatkan...</td></tr>
+      </tbody>
+      <tfoot>
+        <tr>
+          <td colspan="2">Grand total</td>
+          <td class="num" id="grandTshirt">-</td>
+          <td class="num" id="grandMakanan">-</td>
+          <td class="num" id="grandTotal">-</td>
+        </tr>
+      </tfoot>
+    </table>
+
+    <button id="copyBtn">Salin untuk WhatsApp</button>
+    <div class="status" id="status"></div>
+    <a class="back" href="/">&larr; Kembali ke borang</a>
+  </div>
+
+  <script>
+    const reportBody = document.getElementById('reportBody');
+    const statusEl = document.getElementById('status');
+    const copyBtn = document.getElementById('copyBtn');
+    let latestReport = null;
+
+    function fmt(n) {
+      return Number(n || 0).toLocaleString('en-US');
+    }
+
+    function renderTable(report) {
+      reportBody.innerHTML = '';
+      report.families.forEach(function (f) {
+        const tr = document.createElement('tr');
+        tr.innerHTML =
+          '<td>' + (f.familyId || '') + '</td>' +
+          '<td>' + f.ketua + '</td>' +
+          '<td class="num">' + fmt(f.tshirt) + '</td>' +
+          '<td class="num">' + fmt(f.makanan) + '</td>' +
+          '<td class="num">' + fmt(f.total) + '</td>';
+        reportBody.appendChild(tr);
+      });
+      document.getElementById('grandTshirt').textContent = fmt(report.grandTotal.tshirt);
+      document.getElementById('grandMakanan').textContent = fmt(report.grandTotal.makanan);
+      document.getElementById('grandTotal').textContent = fmt(report.grandTotal.total);
+    }
+
+    function buildAsciiTable(report) {
+      const nameWidth = Math.max(
+        6,
+        ...report.families.map(function (f) { return f.ketua.length; }),
+        'TOTAL'.length
+      );
+      const pad = function (s, w) {
+        s = String(s);
+        return s + ' '.repeat(Math.max(0, w - s.length));
+      };
+      const padNum = function (n, w) {
+        const s = fmt(n);
+        return ' '.repeat(Math.max(0, w - s.length)) + s;
+      };
+      const colW = { tshirt: 7, makanan: 7, total: 7 };
+      const lines = [];
+      lines.push(
+        pad('Family', nameWidth) + '  ' +
+        padNum('T-Shirt', colW.tshirt) + '  ' +
+        padNum('Makanan', colW.makanan) + '  ' +
+        padNum('Total', colW.total)
+      );
+      lines.push('-'.repeat(nameWidth + colW.tshirt + colW.makanan + colW.total + 6));
+      report.families.forEach(function (f) {
+        lines.push(
+          pad(f.ketua, nameWidth) + '  ' +
+          padNum(f.tshirt, colW.tshirt) + '  ' +
+          padNum(f.makanan, colW.makanan) + '  ' +
+          padNum(f.total, colW.total)
+        );
+      });
+      lines.push('-'.repeat(nameWidth + colW.tshirt + colW.makanan + colW.total + 6));
+      lines.push(
+        pad('TOTAL', nameWidth) + '  ' +
+        padNum(report.grandTotal.tshirt, colW.tshirt) + '  ' +
+        padNum(report.grandTotal.makanan, colW.makanan) + '  ' +
+        padNum(report.grandTotal.total, colW.total)
+      );
+      return '```\n' + lines.join('\n') + '\n```';
+    }
+
+    copyBtn.addEventListener('click', function () {
+      if (!latestReport) return;
+      const text = buildAsciiTable(latestReport);
+      navigator.clipboard.writeText(text).then(function () {
+        statusEl.className = 'status';
+        statusEl.textContent = 'Disalin! Boleh paste terus dalam WhatsApp.';
+      }).catch(function () {
+        statusEl.className = 'status error';
+        statusEl.textContent = 'Gagal menyalin. Sila salin secara manual.';
+      });
+    });
+
+    fetch('/api/report')
+      .then(function (r) { return r.json(); })
+      .then(function (data) {
+        if (data.error) throw new Error(data.error);
+        latestReport = data;
+        renderTable(data);
+      })
+      .catch(function (err) {
+        reportBody.innerHTML = '<tr><td colspan="5">Ralat: ' + err.message + '</td></tr>';
+      });
+  </script>
+</body>
+</html>
