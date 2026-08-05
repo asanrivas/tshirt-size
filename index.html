@@ -208,8 +208,8 @@
         const opt = document.createElement('option');
         opt.value = entry.name;
         let label = entry.name;
-        if (entry.filled) label += ' ✅ (sudah diisi)';
-        if (entry.paid) label += ' 💰 (sudah bayar)';
+        if (entry.filled) label += ' ✅';
+        if (entry.paid) label += ' 💰';
         opt.textContent = label;
         nameSelect.appendChild(opt);
       });
