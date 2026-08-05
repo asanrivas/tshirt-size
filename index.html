@@ -207,7 +207,10 @@
       names.forEach(function (entry) {
         const opt = document.createElement('option');
         opt.value = entry.name;
-        opt.textContent = entry.filled ? entry.name + ' ✅ (sudah diisi)' : entry.name;
+        let label = entry.name;
+        if (entry.filled) label += ' ✅ (sudah diisi)';
+        if (entry.paid) label += ' 💰 (sudah bayar)';
+        opt.textContent = label;
         nameSelect.appendChild(opt);
       });
     }

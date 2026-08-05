@@ -13,6 +13,7 @@ const SHEET_NAME = 'List Family Haji Zakaria (Size Baju)';
 const HEADER_NAMA = 'nama';
 const HEADER_SIZE = 'size baju';
 const HEADER_CATATAN = 'catatan';
+const HEADER_PAID_TSHIRT = 'dah bayar tshirt';
 
 function doGet() {
   return HtmlService.createHtmlOutputFromFile('index')
@@ -44,7 +45,8 @@ function findHeader_(sheet) {
         headerRow: r + 1,
         namaCol: namaCol + 1,
         sizeCol: sizeCol + 1,
-        catatanCol: row.indexOf(HEADER_CATATAN) + 1 // 0 (falsy) if not found
+        catatanCol: row.indexOf(HEADER_CATATAN) + 1, // 0 (falsy) if not found
+        paidTshirtCol: row.indexOf(HEADER_PAID_TSHIRT) + 1
       };
     }
   }
@@ -55,8 +57,8 @@ function findHeader_(sheet) {
  * Returns the list of names in the Nama column, for populating the
  * form's dropdown so people pick their existing row instead of typing
  * a name that might not match. Each entry also flags whether that row's
- * Size Baju is already filled, so the form can show a "sudah diisi"
- * indicator.
+ * Size Baju is already filled (a "sudah diisi" indicator) and whether
+ * Dah Bayar TShirt is checked (a "sudah bayar" money indicator).
  */
 function getNames() {
   const sheet = getSheet_();
@@ -67,12 +69,19 @@ function getNames() {
   const numRows = lastRow - header.headerRow;
   const namaValues = sheet.getRange(header.headerRow + 1, header.namaCol, numRows, 1).getValues();
   const sizeValues = sheet.getRange(header.headerRow + 1, header.sizeCol, numRows, 1).getValues();
+  const paidValues = header.paidTshirtCol
+    ? sheet.getRange(header.headerRow + 1, header.paidTshirtCol, numRows, 1).getValues()
+    : null;
 
   const result = [];
   for (let i = 0; i < namaValues.length; i++) {
     const name = String(namaValues[i][0]).trim();
     if (!name) continue;
-    result.push({ name: name, filled: String(sizeValues[i][0]).trim().length > 0 });
+    result.push({
+      name: name,
+      filled: String(sizeValues[i][0]).trim().length > 0,
+      paid: paidValues ? paidValues[i][0] === true : false
+    });
   }
   return result;
 }
