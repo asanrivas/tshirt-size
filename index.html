@@ -136,6 +136,48 @@
       color: var(--muted);
       margin-top: 6px;
     }
+    .price-card {
+      max-width: 480px;
+      margin: 20px auto 0;
+      background: var(--card);
+      border-radius: 16px;
+      padding: 20px 20px 24px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+    }
+    .price-card h2 {
+      font-size: 1.05rem;
+      margin: 0 0 4px;
+    }
+    .price-card h3 {
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 0.02em;
+      color: var(--muted);
+      margin: 18px 0 8px;
+    }
+    .price-card h3:first-of-type {
+      margin-top: 14px;
+    }
+    .price-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.9rem;
+    }
+    .price-table th, .price-table td {
+      text-align: left;
+      padding: 8px 4px;
+      border-bottom: 1px solid var(--border);
+    }
+    .price-table th {
+      color: var(--muted);
+      font-weight: 600;
+      font-size: 0.78rem;
+      text-transform: uppercase;
+    }
+    .price-table td.num, .price-table th.num {
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+    }
   </style>
 </head>
 <body>
@@ -170,6 +212,59 @@
       <div class="status" id="status"></div>
     </form>
     <a href="/report.html" style="display:inline-block; margin-top:20px; color:var(--accent); font-size:0.9rem; text-decoration:none;">Lihat ringkasan perfamily &rarr;</a>
+  </div>
+
+  <div class="price-card">
+    <h2>Harga Rujukan</h2>
+    <p class="subtitle" style="margin:0;">Harga T-Shirt dan Makanan setiap orang.</p>
+
+    <h3>T-Shirt</h3>
+    <table class="price-table">
+      <thead>
+        <tr>
+          <th>Jenis</th>
+          <th class="num">Dewasa (RM)</th>
+          <th class="num">Kanak2 (RM)</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Muslimah</td>
+          <td class="num">15</td>
+          <td class="num">10</td>
+        </tr>
+        <tr>
+          <td>Lengan Panjang</td>
+          <td class="num">12</td>
+          <td class="num">10</td>
+        </tr>
+        <tr>
+          <td>Lengan Pendek</td>
+          <td class="num">10</td>
+          <td class="num">8</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3>Makanan</h3>
+    <table class="price-table">
+      <thead>
+        <tr>
+          <th>Kategori</th>
+          <th class="num">Harga (RM)</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Dewasa</td>
+          <td class="num">20</td>
+        </tr>
+        <tr>
+          <td>Kanak2</td>
+          <td class="num">5</td>
+        </tr>
+      </tbody>
+    </table>
   </div>
 
   <script>
